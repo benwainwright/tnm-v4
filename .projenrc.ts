@@ -2,10 +2,16 @@ import { web, AwsCdkTypeScriptApp, TypeScriptJsxMode, AwsCdkConstructLibrary } f
 import { Task } from 'projen/lib/tasks';
 
 import { TypeScriptProject } from 'projen';
+
 const rootProject = new TypeScriptProject({
   defaultReleaseBranch: 'main',
   name: 'tnm-v4',
   projenrcTs: true,
+  disableTsconfig: true,
+  jest: false,
+  srcdir: ".",
+  testdir: ".",
+  eslint: false
 });
 
 rootProject.package.addField("private", true)
@@ -254,7 +260,5 @@ tnmApp.addTask("storybook:build")
 
 addCypressEnvVars(tnmApp.addTask("test:cypress:open"))
                         .exec("yarn cypress open")
-
-tnmApp.synth();
 
 rootProject.synth();
