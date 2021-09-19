@@ -10,6 +10,7 @@ const rootProject = new TypeScriptProject({
   disableTsconfig: true,
   jest: false,
   srcdir: ".",
+  mergify: false,
   testdir: ".",
   eslint: false
 });

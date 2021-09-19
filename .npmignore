@@ -2,7 +2,6 @@
 /.projen/
 /dist/changelog.md
 /dist/version.txt
-/.mergify.yml
 /./
 !/lib/
 !/lib/**/*.js
