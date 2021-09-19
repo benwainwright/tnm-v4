@@ -1,0 +1,252 @@
+{
+  "tasks": {
+    "clobber": {
+      "name": "clobber",
+      "description": "hard resets to HEAD of origin and cleans the local repo",
+      "env": {
+        "BRANCH": "$(git branch --show-current)"
+      },
+      "steps": [
+        {
+          "exec": "git checkout -b scratch",
+          "name": "save current HEAD in \"scratch\" branch"
+        },
+        {
+          "exec": "git checkout $BRANCH"
+        },
+        {
+          "exec": "git fetch origin",
+          "name": "fetch latest changes from origin"
+        },
+        {
+          "exec": "git reset --hard origin/$BRANCH",
+          "name": "hard reset to origin commit"
+        },
+        {
+          "exec": "git clean -fdx",
+          "name": "clean all untracked files"
+        },
+        {
+          "say": "ready to rock! (unpushed commits are under the \"scratch\" branch)"
+        }
+      ],
+      "condition": "git diff --exit-code > /dev/null"
+    },
+    "compile": {
+      "name": "compile",
+      "description": "Only compile",
+      "steps": [
+        {
+          "exec": "tsc --build"
+        }
+      ]
+    },
+    "test:compile": {
+      "name": "test:compile",
+      "description": "compiles the test code",
+      "steps": [
+        {
+          "exec": "tsc --noEmit --project tsconfig.jest.json"
+        }
+      ]
+    },
+    "test": {
+      "name": "test",
+      "description": "Run tests",
+      "steps": [
+        {
+          "exec": "rm -fr lib/"
+        },
+        {
+          "spawn": "test:compile"
+        },
+        {
+          "exec": "jest --passWithNoTests --all"
+        },
+        {
+          "spawn": "eslint"
+        }
+      ]
+    },
+    "build": {
+      "name": "build",
+      "description": "Full release build (test+compile)",
+      "steps": [
+        {
+          "spawn": "test"
+        },
+        {
+          "spawn": "compile"
+        },
+        {
+          "exec": "next build"
+        }
+      ]
+    },
+    "test:watch": {
+      "name": "test:watch",
+      "description": "Run jest in watch mode",
+      "steps": [
+        {
+          "exec": "jest --watch"
+        }
+      ]
+    },
+    "test:update": {
+      "name": "test:update",
+      "description": "Update jest snapshots",
+      "steps": [
+        {
+          "exec": "jest --updateSnapshot"
+        }
+      ]
+    },
+    "upgrade": {
+      "name": "upgrade",
+      "description": "upgrade dependencies",
+      "env": {
+        "CI": "0"
+      },
+      "steps": [
+        {
+          "exec": "npm-check-updates --upgrade --target=minor --reject='projen'"
+        },
+        {
+          "exec": "yarn install --check-files"
+        },
+        {
+          "exec": "yarn upgrade @types/jest @types/node @types/react @types/react-dom @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint eslint-import-resolver-node eslint-import-resolver-typescript eslint-plugin-import jest jest-junit json-schema npm-check-updates ts-jest ts-node typescript @aws-amplify/auth @axe-core/react @babel/core @babel/plugin-proposal-decorators @cypress/code-coverage @emotion/babel-plugin @emotion/jest @emotion/react @emotion/styled @storybook/addon-a11y @storybook/addon-actions @storybook/addon-essentials @storybook/addon-links @storybook/builder-webpack5 @storybook/cli @storybook/manager-webpack5 @storybook/react @svgr/webpack @testing-library/jest-dom @testing-library/react @testing-library/react-hooks @testing-library/user-event @types/aws-lambda @types/enzyme @types/jest @types/jest-when @types/jsonwebtoken @types/jwk-to-pem @types/lodash @types/ramda @types/react-helmet @types/testing-library__jest-dom @types/uuid @wojtekmaj/enzyme-adapter-react-17 amazon-cognito-identity-js aws-lambda aws-sdk aws-sdk-mock axios babel-plugin-module-resolver babel-preset-react-app cypress enzyme esbuild fp-ts inversify jest jest-enzyme jest-extended jest-mock-extended jest-transform-stub jest-when jsonwebtoken jwk-to-pem lodash next next-aws-lambda-webpack-plugin next-images ramda react react-dom react-helmet reflect-metadata ts-jest tslog uuid webpack"
+        },
+        {
+          "exec": "npx projen"
+        }
+      ]
+    },
+    "upgrade-projen": {
+      "name": "upgrade-projen",
+      "description": "upgrade projen",
+      "env": {
+        "CI": "0"
+      },
+      "steps": [
+        {
+          "exec": "npm-check-updates --upgrade --target=minor --filter='projen'"
+        },
+        {
+          "exec": "yarn install --check-files"
+        },
+        {
+          "exec": "yarn upgrade projen"
+        },
+        {
+          "exec": "npx projen"
+        }
+      ]
+    },
+    "watch": {
+      "name": "watch",
+      "description": "Watch & compile in the background",
+      "steps": [
+        {
+          "exec": "tsc --build -w"
+        }
+      ]
+    },
+    "eslint": {
+      "name": "eslint",
+      "description": "Runs eslint against the codebase",
+      "steps": [
+        {
+          "exec": "eslint --ext .ts,.tsx --fix --no-error-on-unmatched-pattern src test build-tools .projenrc.js"
+        }
+      ]
+    },
+    "default": {
+      "name": "default",
+      "steps": [
+        {
+          "exec": "ts-node --skip-project .projenrc.ts"
+        }
+      ]
+    },
+    "dev": {
+      "name": "dev",
+      "description": "Starts the Next.js application in development mode",
+      "steps": [
+        {
+          "exec": "next dev"
+        }
+      ]
+    },
+    "export": {
+      "name": "export",
+      "description": "Exports the application for production deployment",
+      "steps": [
+        {
+          "exec": "next export"
+        }
+      ]
+    },
+    "server": {
+      "name": "server",
+      "description": "Starts the Next.js application in production mode",
+      "steps": [
+        {
+          "exec": "next start"
+        }
+      ]
+    },
+    "telemetry": {
+      "name": "telemetry",
+      "description": "Checks the status of Next.js telemetry collection",
+      "steps": [
+        {
+          "exec": "next telemetry"
+        }
+      ]
+    },
+    "build:backend": {
+      "name": "build:backend",
+      "steps": [
+        {
+          "exec": "yarn node src/scripts/build-backend.js"
+        }
+      ]
+    },
+    "storybook": {
+      "name": "storybook",
+      "steps": [
+        {
+          "exec": "start-storybook --static-dir ./src/assets"
+        }
+      ]
+    },
+    "storybook:build": {
+      "name": "storybook:build",
+      "steps": [
+        {
+          "exec": "build-storybook --static-dir ./src/assets --output-dir ./storybook"
+        }
+      ]
+    },
+    "test:cypress:open": {
+      "name": "test:cypress:open",
+      "env": {
+        "CYPRESS_TEST_REGISTER_USER": "test-user-1",
+        "CYPRESS_TEST_EMAIL": "a@b.com",
+        "CYPRESS_TEST_USER_INITIAL_PASSWORD": "123.123Aa",
+        "CYPRESS_INT_TEST_EMAIL": "a1@b1.com",
+        "CYPRESS_INT_TEST_PASSWORD": "123.123Aa"
+      },
+      "steps": [
+        {
+          "exec": "yarn cypress open"
+        }
+      ]
+    }
+  },
+  "env": {
+    "PATH": "$(npx -c \"node -e \\\"console.log(process.env.PATH)\\\"\")"
+  },
+  "//": "~~ Generated by projen. To modify, edit .projenrc.js and run \"npx projen\"."
+}
