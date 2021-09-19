@@ -1,4 +1,4 @@
-import { web, AwsCdkTypeScriptApp, TypeScriptJsxMode } from 'projen';
+import { web, AwsCdkTypeScriptApp, TypeScriptJsxMode, AwsCdkConstructLibrary } from 'projen';
 import { Task } from 'projen/lib/tasks';
 
 import { TypeScriptProject } from 'projen';
@@ -97,7 +97,7 @@ const tnmApp = new web.NextJsTypeScriptProject({
     'backend',
     'build',
   ],
-  name: 'tnm-v3',
+  name: '@tnm-v4/app',
   srcdir: 'src',
   tailwind: false,
   compileBeforeTest: false,
@@ -161,8 +161,19 @@ const cdk = [
   "appsync"
 ]
 
+const constructs = new AwsCdkConstructLibrary({
+  name: "@tnm-v4/constructs",
+  outdir: "packages/constructs",
+  cdkVersion: '1.123.0',
+  repositoryUrl: "https://github.com/benwainwright/tnm-v4",
+  author: "Ben Wainwright",
+  authorAddress: "https://github.com/benwainwright",
+  defaultReleaseBranch: 'main',
+  parent: rootProject
+})
+
 const infrastructure = new AwsCdkTypeScriptApp({
-  name: 'tnm-v3-infrastructure',
+  name: '@tnm-v4/infrastructure',
   cdkVersion: '1.123.0',
   context: {
     "@aws-cdk/core:newStyleStackSynthesis": "true"
@@ -196,7 +207,8 @@ const infrastructure = new AwsCdkTypeScriptApp({
 
 rootProject.package.addField("workspaces", [
   tnmApp.outdir,
-  infrastructure.outdir
+  infrastructure.outdir,
+  constructs.outdir
 ])
 
 const infrastructureJestTsconfig = infrastructure.tryFindObjectFile('tsconfig.jest.json')

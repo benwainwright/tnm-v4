@@ -37,7 +37,10 @@
       "description": "Only compile",
       "steps": [
         {
-          "exec": "tsc --build"
+          "exec": "jsii --silence-warnings=reserved-word --no-fix-peer-dependencies"
+        },
+        {
+          "spawn": "docgen"
         }
       ]
     },
@@ -62,6 +65,9 @@
         },
         {
           "exec": "jest --passWithNoTests --all"
+        },
+        {
+          "spawn": "eslint"
         }
       ]
     },
@@ -76,7 +82,7 @@
           "spawn": "compile"
         },
         {
-          "exec": "next build"
+          "spawn": "package"
         }
       ]
     },
@@ -112,7 +118,7 @@
           "exec": "yarn install --check-files"
         },
         {
-          "exec": "yarn upgrade @types/jest @types/node @types/react @types/react-dom jest jest-junit npm-check-updates ts-jest ts-node typescript @aws-amplify/auth @axe-core/react @babel/core @babel/plugin-proposal-decorators @cypress/code-coverage @emotion/babel-plugin @emotion/jest @emotion/react @emotion/styled @storybook/addon-a11y @storybook/addon-actions @storybook/addon-essentials @storybook/addon-links @storybook/builder-webpack5 @storybook/cli @storybook/manager-webpack5 @storybook/react @svgr/webpack @testing-library/jest-dom @testing-library/react @testing-library/react-hooks @testing-library/user-event @types/aws-lambda @types/enzyme @types/jest @types/jest-when @types/jsonwebtoken @types/jwk-to-pem @types/lodash @types/ramda @types/react-helmet @types/testing-library__jest-dom @types/uuid @wojtekmaj/enzyme-adapter-react-17 amazon-cognito-identity-js aws-lambda aws-sdk aws-sdk-mock axios babel-plugin-module-resolver babel-preset-react-app cypress enzyme esbuild fp-ts inversify jest jest-enzyme jest-extended jest-mock-extended jest-transform-stub jest-when jsonwebtoken jwk-to-pem lodash next next-aws-lambda-webpack-plugin next-images ramda react react-dom react-helmet reflect-metadata ts-jest tslog uuid webpack"
+          "exec": "yarn upgrade @aws-cdk/assert @types/jest @types/node @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint eslint-import-resolver-node eslint-import-resolver-typescript eslint-plugin-import jest jest-junit jsii jsii-diff jsii-docgen jsii-pacmak json-schema npm-check-updates ts-jest typescript constructs"
         },
         {
           "exec": "npx projen"
@@ -140,95 +146,56 @@
         }
       ]
     },
+    "default": {
+      "name": "default",
+      "steps": [
+        {
+          "exec": "node .projenrc.js"
+        }
+      ]
+    },
     "watch": {
       "name": "watch",
       "description": "Watch & compile in the background",
       "steps": [
         {
-          "exec": "tsc --build -w"
+          "exec": "jsii -w --silence-warnings=reserved-word --no-fix-peer-dependencies"
         }
       ]
     },
-    "default": {
-      "name": "default",
+    "package": {
+      "name": "package",
+      "description": "Create an npm tarball",
       "steps": [
         {
-          "exec": "ts-node --skip-project .projenrc.ts"
+          "exec": "jsii-pacmak"
         }
       ]
     },
-    "dev": {
-      "name": "dev",
-      "description": "Starts the Next.js application in development mode",
+    "eslint": {
+      "name": "eslint",
+      "description": "Runs eslint against the codebase",
       "steps": [
         {
-          "exec": "next dev"
+          "exec": "eslint --ext .ts,.tsx --fix --no-error-on-unmatched-pattern src test build-tools .projenrc.js"
         }
       ]
     },
-    "export": {
-      "name": "export",
-      "description": "Exports the application for production deployment",
+    "compat": {
+      "name": "compat",
+      "description": "Perform API compatibility check against latest version",
       "steps": [
         {
-          "exec": "next export"
+          "exec": "jsii-diff npm:$(node -p \"require('./package.json').name\") -k --ignore-file .compatignore || (echo \"\nUNEXPECTED BREAKING CHANGES: add keys such as 'removed:constructs.Node.of' to .compatignore to skip.\n\" && exit 1)"
         }
       ]
     },
-    "server": {
-      "name": "server",
-      "description": "Starts the Next.js application in production mode",
+    "docgen": {
+      "name": "docgen",
+      "description": "Generate API.md from .jsii manifest",
       "steps": [
         {
-          "exec": "next start"
-        }
-      ]
-    },
-    "telemetry": {
-      "name": "telemetry",
-      "description": "Checks the status of Next.js telemetry collection",
-      "steps": [
-        {
-          "exec": "next telemetry"
-        }
-      ]
-    },
-    "build:backend": {
-      "name": "build:backend",
-      "steps": [
-        {
-          "exec": "yarn node src/scripts/build-backend.js"
-        }
-      ]
-    },
-    "storybook": {
-      "name": "storybook",
-      "steps": [
-        {
-          "exec": "start-storybook --static-dir ./src/assets"
-        }
-      ]
-    },
-    "storybook:build": {
-      "name": "storybook:build",
-      "steps": [
-        {
-          "exec": "build-storybook --static-dir ./src/assets --output-dir ./storybook"
-        }
-      ]
-    },
-    "test:cypress:open": {
-      "name": "test:cypress:open",
-      "env": {
-        "CYPRESS_TEST_REGISTER_USER": "test-user-1",
-        "CYPRESS_TEST_EMAIL": "a@b.com",
-        "CYPRESS_TEST_USER_INITIAL_PASSWORD": "123.123Aa",
-        "CYPRESS_INT_TEST_EMAIL": "a1@b1.com",
-        "CYPRESS_INT_TEST_PASSWORD": "123.123Aa"
-      },
-      "steps": [
-        {
-          "exec": "yarn cypress open"
+          "exec": "jsii-docgen"
         }
       ]
     }
