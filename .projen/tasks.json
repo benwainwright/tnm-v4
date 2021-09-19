@@ -188,6 +188,19 @@
         }
       ]
     },
+    "test:all": {
+      "name": "test:all",
+      "steps": [
+        {
+          "exec": "yarn test",
+          "cwd": "/Users/benwainwright1/repos/tnm-v4/packages/app"
+        },
+        {
+          "exec": "yarn test",
+          "cwd": "/Users/benwainwright1/repos/tnm-v4/packages/infrastructure"
+        }
+      ]
+    },
     "release": {
       "name": "release",
       "description": "Prepare a release from \"main\" branch",

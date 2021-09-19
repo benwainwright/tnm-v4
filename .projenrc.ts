@@ -259,6 +259,11 @@ tnmApp.addTask("storybook")
 tnmApp.addTask("storybook:build")
       .exec('build-storybook --static-dir ./src/assets --output-dir ./storybook')
 
+const test = rootProject.addTask("test:all")
+
+test.exec("yarn test", { cwd: tnmApp.outdir })
+test.exec("yarn test", { cwd: infrastructure.outdir })
+
 addCypressEnvVars(tnmApp.addTask("test:cypress:open"))
                         .exec("yarn cypress open")
 

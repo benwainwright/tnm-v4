@@ -14,6 +14,7 @@
     "watch": "npx projen watch",
     "package": "npx projen package",
     "default": "npx projen default",
+    "test:all": "npx projen test:all",
     "release": "npx projen release",
     "projen": "npx projen"
   },
