@@ -193,11 +193,11 @@
       "steps": [
         {
           "exec": "yarn test",
-          "cwd": "/Users/benwainwright1/repos/tnm-v4/packages/app"
+          "cwd": "/home/runner/work/tnm-v4/tnm-v4/packages/app"
         },
         {
           "exec": "yarn test",
-          "cwd": "/Users/benwainwright1/repos/tnm-v4/packages/infrastructure"
+          "cwd": "/home/runner/work/tnm-v4/tnm-v4/packages/infrastructure"
         }
       ]
     },
